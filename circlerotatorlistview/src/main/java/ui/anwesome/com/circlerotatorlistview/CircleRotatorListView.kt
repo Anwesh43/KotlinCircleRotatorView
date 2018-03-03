@@ -3,6 +3,7 @@ package ui.anwesome.com.circlerotatorlistview
 /**
  * Created by anweshmishra on 03/03/18.
  */
+import android.app.Activity
 import android.view.*
 import android.content.*
 import android.graphics.*
@@ -79,6 +80,7 @@ class CircleRotatorListView(ctx : Context, var n : Int = 5) : View(ctx) {
         }
         fun draw(canvas : Canvas, paint : Paint) {
             canvas.save()
+            canvas.translate(0f, h/2)
             for(i in 0..state.j) {
                 rotators.at(i)?.draw(canvas, paint)
             }
@@ -141,6 +143,13 @@ class CircleRotatorListView(ctx : Context, var n : Int = 5) : View(ctx) {
             if(animated) {
                 animated = false
             }
+        }
+    }
+    companion object {
+        fun create(activity : Activity):CircleRotatorListView {
+            val view = CircleRotatorListView(activity)
+            activity.setContentView(view)
+            return view
         }
     }
 }
