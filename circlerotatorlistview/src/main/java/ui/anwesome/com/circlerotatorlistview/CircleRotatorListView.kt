@@ -14,7 +14,7 @@ class CircleRotatorListView(ctx : Context, var n : Int = 5) : View(ctx) {
     val paint : Paint = Paint(Paint.ANTI_ALIAS_FLAG)
     val renderer = Renderer(this)
     var onCircleRotateListener : OnCircleRotateListener ?= null
-    fun addOnRotateListener(onRotateListener : () -> Unit) {
+    fun addOnRotateListener(onRotateListener : (Int) -> Unit) {
         onCircleRotateListener = OnCircleRotateListener(onRotateListener)
     }
     override fun onDraw(canvas : Canvas) {
@@ -93,10 +93,10 @@ class CircleRotatorListView(ctx : Context, var n : Int = 5) : View(ctx) {
             }
             canvas.restore()
         }
-        fun update(stopcb : (Float) -> Unit) {
+        fun update(stopcb : (Float, Int) -> Unit) {
             rotators.at(state.j)?.update {
                 state.incrementCounter()
-                stopcb(it)
+                stopcb(it, state.j)
             }
         }
         fun startUpdating(startcb : () -> Unit) {
@@ -119,10 +119,10 @@ class CircleRotatorListView(ctx : Context, var n : Int = 5) : View(ctx) {
             circleRotatorList?.draw(canvas, paint)
             time++
             animator.animate {
-                circleRotatorList?.update {
+                circleRotatorList?.update {scale, j ->
                     animator.stop()
-                    when(it) {
-                        1f -> view.onCircleRotateListener?.onRotateListener?.invoke()
+                    when(scale) {
+                        1f -> view.onCircleRotateListener?.onRotateListener?.invoke(j)
                     }
                 }
             }
@@ -166,7 +166,7 @@ class CircleRotatorListView(ctx : Context, var n : Int = 5) : View(ctx) {
             return view
         }
     }
-    data class OnCircleRotateListener(var onRotateListener : () -> Unit)
+    data class OnCircleRotateListener(var onRotateListener : (Int) -> Unit)
 }
 fun ConcurrentLinkedQueue<CircleRotatorListView.CircleRotator>.at(index : Int) : CircleRotatorListView.CircleRotator? {
     var i = 0
