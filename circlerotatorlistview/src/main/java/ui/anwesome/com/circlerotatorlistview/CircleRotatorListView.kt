@@ -44,4 +44,23 @@ class CircleRotatorListView(ctx : Context) : View(ctx) {
             }
         }
     }
+    data class CircleRotator(var i : Int, var size : Float) {
+        val state =  State()
+        fun draw(canvas : Canvas, paint : Paint) {
+            val x = size / 2 + i * size
+            paint.style = Paint.Style.STROKE
+            paint.strokeWidth = size/15
+            canvas.save()
+            canvas.translate(x, size/2)
+            canvas.rotate(180 * (1 - state.scale))
+            canvas.drawCircle(0f, 0f, size/2, paint)
+            canvas.restore()
+        }
+        fun update(stopcb : (Float) -> Unit) {
+            state.update(stopcb)
+        }
+        fun startUpdating(startcb : () -> Unit) {
+            state.startUpdating(startcb)
+        }
+    }
 }
