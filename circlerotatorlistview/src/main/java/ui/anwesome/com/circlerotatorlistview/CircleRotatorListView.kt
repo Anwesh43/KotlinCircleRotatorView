@@ -6,6 +6,8 @@ package ui.anwesome.com.circlerotatorlistview
 import android.view.*
 import android.content.*
 import android.graphics.*
+import java.util.concurrent.ConcurrentLinkedQueue
+
 class CircleRotatorListView(ctx : Context) : View(ctx) {
     val paint : Paint = Paint(Paint.ANTI_ALIAS_FLAG)
     override fun onDraw(canvas : Canvas) {
@@ -63,4 +65,40 @@ class CircleRotatorListView(ctx : Context) : View(ctx) {
             state.startUpdating(startcb)
         }
     }
+    data class CircleRotatorList(var n : Int, var w : Float, var h : Float) {
+        val state = ContainerState(n)
+        val rotators: ConcurrentLinkedQueue<CircleRotator> = ConcurrentLinkedQueue()
+        init {
+            if(n > 0) {
+                val size = w / (2 * n)
+                for(i in 0..n-1) {
+                    rotators.add(CircleRotator(i, size))
+                }
+            }
+        }
+        fun draw(canvas : Canvas, paint : Paint) {
+            for(i in 0..state.j) {
+                rotators.at(i)?.draw(canvas, paint)
+            }
+        }
+        fun update(stopcb : (Float) -> Unit) {
+            rotators.at(state.j)?.update {
+                state.incrementCounter()
+                stopcb(it)
+            }
+        }
+        fun startUpdating(startcb : () -> Unit) {
+            rotators?.at(state.j)?.startUpdating(startcb)
+        }
+    }
+}
+fun ConcurrentLinkedQueue<CircleRotatorListView.CircleRotator>.at(index : Int) : CircleRotatorListView.CircleRotator? {
+    var i = 0
+    forEach {
+        if (i == index) {
+            return it
+        }
+        i++
+    }
+    return null
 }
