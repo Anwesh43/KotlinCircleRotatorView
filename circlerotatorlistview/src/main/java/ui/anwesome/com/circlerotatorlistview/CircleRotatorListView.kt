@@ -8,7 +8,7 @@ import android.content.*
 import android.graphics.*
 import java.util.concurrent.ConcurrentLinkedQueue
 
-class CircleRotatorListView(ctx : Context) : View(ctx) {
+class CircleRotatorListView(ctx : Context, var n : Int = 5) : View(ctx) {
     val paint : Paint = Paint(Paint.ANTI_ALIAS_FLAG)
     override fun onDraw(canvas : Canvas) {
 
@@ -77,9 +77,11 @@ class CircleRotatorListView(ctx : Context) : View(ctx) {
             }
         }
         fun draw(canvas : Canvas, paint : Paint) {
+            canvas.save()
             for(i in 0..state.j) {
                 rotators.at(i)?.draw(canvas, paint)
             }
+            canvas.restore()
         }
         fun update(stopcb : (Float) -> Unit) {
             rotators.at(state.j)?.update {
@@ -89,6 +91,24 @@ class CircleRotatorListView(ctx : Context) : View(ctx) {
         }
         fun startUpdating(startcb : () -> Unit) {
             rotators?.at(state.j)?.startUpdating(startcb)
+        }
+    }
+    data class Renderer(var view : CircleRotatorListView, var time : Int = 0) {
+        var circleRotatorList : CircleRotatorList ?= null
+        fun render(canvas : Canvas, paint : Paint) {
+            if(time == 0) {
+                val w = canvas.width.toFloat()
+                val h = canvas.height.toFloat()
+                circleRotatorList = CircleRotatorList(view.n, w, h)
+            }
+            circleRotatorList?.draw(canvas, paint)
+            time++
+
+        }
+        fun handleTap() {
+            circleRotatorList?.startUpdating {
+                
+            }
         }
     }
 }
