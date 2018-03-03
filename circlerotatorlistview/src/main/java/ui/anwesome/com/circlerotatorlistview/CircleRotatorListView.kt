@@ -13,6 +13,10 @@ import java.util.concurrent.ConcurrentLinkedQueue
 class CircleRotatorListView(ctx : Context, var n : Int = 5) : View(ctx) {
     val paint : Paint = Paint(Paint.ANTI_ALIAS_FLAG)
     val renderer = Renderer(this)
+    var onCircleRotateListener : OnCircleRotateListener ?= null
+    fun addOnRotateListener(onRotateListener : () -> Unit) {
+        onCircleRotateListener = OnCircleRotateListener(onRotateListener)
+    }
     override fun onDraw(canvas : Canvas) {
         renderer.render(canvas, paint)
     }
@@ -117,6 +121,9 @@ class CircleRotatorListView(ctx : Context, var n : Int = 5) : View(ctx) {
             animator.animate {
                 circleRotatorList?.update {
                     animator.stop()
+                    when(it) {
+                        1f -> view.onCircleRotateListener?.onRotateListener?.invoke()
+                    }
                 }
             }
 
@@ -159,6 +166,7 @@ class CircleRotatorListView(ctx : Context, var n : Int = 5) : View(ctx) {
             return view
         }
     }
+    data class OnCircleRotateListener(var onRotateListener : () -> Unit)
 }
 fun ConcurrentLinkedQueue<CircleRotatorListView.CircleRotator>.at(index : Int) : CircleRotatorListView.CircleRotator? {
     var i = 0
