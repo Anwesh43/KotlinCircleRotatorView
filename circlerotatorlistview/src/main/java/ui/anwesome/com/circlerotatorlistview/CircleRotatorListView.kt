@@ -95,6 +95,7 @@ class CircleRotatorListView(ctx : Context, var n : Int = 5) : View(ctx) {
     }
     data class Renderer(var view : CircleRotatorListView, var time : Int = 0) {
         var circleRotatorList : CircleRotatorList ?= null
+        val animator = Animator(view)
         fun render(canvas : Canvas, paint : Paint) {
             if(time == 0) {
                 val w = canvas.width.toFloat()
@@ -103,11 +104,16 @@ class CircleRotatorListView(ctx : Context, var n : Int = 5) : View(ctx) {
             }
             circleRotatorList?.draw(canvas, paint)
             time++
+            animator.animate {
+                circleRotatorList?.update {
+                    animator.stop()
+                }
+            }
 
         }
         fun handleTap() {
             circleRotatorList?.startUpdating {
-
+                animator.start()
             }
         }
     }
